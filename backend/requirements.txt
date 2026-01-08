@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+pandas
+python-jose[cryptography]
+python-dotenv
+requests
+passlib[bcrypt]
+pydantic[email]
+python-multipart
+scikit-learn
+pytesseract
+Pillow
+huggingface_hub
+pytest
+httpx
