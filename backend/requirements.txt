@@ -14,3 +14,4 @@ Pillow
 huggingface_hub
 pytest
 httpx
+psycopg2-binary
