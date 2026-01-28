@@ -5,7 +5,7 @@ services:
   - type: web
     name: smart-nutrition-backend
     env: docker
-    dockerFilePath: Dockerfile
+    dockerfilePath: Dockerfile
     plan: free
     healthCheckPath: /
     envVars:
@@ -23,7 +23,7 @@ services:
     name: smart-nutrition-frontend
     env: docker
     dockerContext: frontend
-    dockerFilePath: frontend/Dockerfile
+    dockerfilePath: frontend/Dockerfile
     plan: free
     envVars:
       - key: VITE_API_URL
