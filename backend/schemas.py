@@ -9,6 +9,7 @@ class UserOut(BaseModel):
     id: int
     email: EmailStr
     is_active: bool
+    is_public: bool = True
     age: int | None = None
     weight: float | None = None
     height: float | None = None
@@ -16,10 +17,9 @@ class UserOut(BaseModel):
     goal: str | None = None
     target_calories: int | None = None
     streak_count: int | None = 0
-    streak_count: int | None = 0
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserProfileUpdate(BaseModel):
     age: int | None = None
@@ -28,6 +28,7 @@ class UserProfileUpdate(BaseModel):
     activity_level: str | None = None
     goal: str | None = None
     target_calories: int | None = None
+    is_public: bool | None = None
 
 class Token(BaseModel):
     access_token: str

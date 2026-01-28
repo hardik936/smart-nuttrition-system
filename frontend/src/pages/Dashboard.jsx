@@ -35,9 +35,26 @@ const Dashboard = () => {
             setLoading(false);
         } catch (err) {
             console.error(err);
-            setError('Failed to fetch data.');
+            const msg = err.response?.data?.detail || err.message || 'Failed to fetch data.';
+            setError(msg);
             setLoading(false);
+            if (err.response?.status === 401) {
+                logout();
+            }
         }
+    };
+
+    const calculateTotals = (currentLogs) => {
+        const newTotals = currentLogs.reduce((acc, log) => {
+            const factor = log.quantity / 100;
+            return {
+                calories: acc.calories + (log.food.calories * factor),
+                protein: acc.protein + (log.food.protein * factor),
+                carbs: acc.carbs + (log.food.carbs * factor),
+                fat: acc.fat + (log.food.fat * factor)
+            };
+        }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+        setTotals(newTotals);
     };
 
     const handleVoiceLog = () => {

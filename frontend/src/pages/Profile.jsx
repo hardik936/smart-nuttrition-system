@@ -3,14 +3,15 @@ import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
-    const { user, login } = useAuth(); // Re-fetch user details if needed, or update context
+    const { user, login } = useAuth();
     const [formData, setFormData] = useState({
         age: '',
         weight: '',
         height: '',
         activity_level: 'sedentary',
         goal: 'maintain',
-        target_calories: 2000
+        target_calories: 2000,
+        is_public: true
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -30,7 +31,8 @@ const Profile = () => {
                 height: data.height || '',
                 activity_level: data.activity_level || 'sedentary',
                 goal: data.goal || 'maintain',
-                target_calories: data.target_calories || 2000
+                target_calories: data.target_calories || 2000,
+                is_public: data.is_public !== undefined ? data.is_public : true
             });
             setLoading(false);
         } catch (err) {
@@ -60,8 +62,7 @@ const Profile = () => {
 
         if (!w || !h || !a) return null;
 
-        // BMR (Mifflin-St Jeor) - Simplified average for now since we don't track gender
-        // Assuming male for baseline or average: 10W + 6.25H - 5A + 5
+        // BMR (Mifflin-St Jeor)
         let bmr = (10 * w) + (6.25 * h) - (5 * a) + 5;
 
         // TDEE Multipliers
@@ -74,7 +75,6 @@ const Profile = () => {
 
         let tdee = bmr * (multipliers[data.activity_level] || 1.2);
 
-        // Goal adjustment
         if (data.goal === 'lose_weight') return Math.round(tdee - 500);
         if (data.goal === 'gain_muscle') return Math.round(tdee + 300);
         return Math.round(tdee);
@@ -91,7 +91,8 @@ const Profile = () => {
                 height: parseFloat(formData.height) || null,
                 activity_level: formData.activity_level,
                 goal: formData.goal,
-                target_calories: parseInt(formData.target_calories)
+                target_calories: parseInt(formData.target_calories),
+                is_public: formData.is_public
             });
             setMessage('Profile updated successfully!');
         } catch (err) {
@@ -141,6 +142,19 @@ const Profile = () => {
                             <option value="maintain">Maintain Weight</option>
                             <option value="gain_muscle">Gain Muscle</option>
                         </select>
+                    </div>
+
+                    <div style={{ borderTop: '1px solid #eee', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                        <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
+                            <input
+                                type="checkbox"
+                                name="is_public"
+                                id="is_public"
+                                checked={formData.is_public === undefined ? true : formData.is_public}
+                                onChange={(e) => setFormData(prev => ({ ...prev, is_public: e.target.checked }))}
+                            />
+                            <label htmlFor="is_public" style={{ margin: 0 }}>Public Profile (Visible on Leaderboard)</label>
+                        </div>
                     </div>
 
                     <div style={{ borderTop: '1px solid #eee', paddingTop: '1rem', marginTop: '0.5rem' }}>

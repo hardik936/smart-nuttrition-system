@@ -8,9 +8,19 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_started
     environment:
       DATABASE_URL: postgresql://user:password@db:5432/smartnutrition
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
 
   db:
     image: postgres:alpine
@@ -21,6 +31,11 @@ services:
       POSTGRES_DB: smartnutrition
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d smartnutrition"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

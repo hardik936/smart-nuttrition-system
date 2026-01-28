@@ -40,6 +40,9 @@ app.include_router(plan.router, prefix="/api/v1/plan", tags=["plan"])
 from routes import foods
 app.include_router(foods.router, prefix="/api/v1/foods", tags=["foods"])
 
+from routes import social
+app.include_router(social.router, prefix="/api/v1", tags=["social"])
+
 @app.get("/")
 def read_root():
     return {"message": "NutriTrack API is running"}

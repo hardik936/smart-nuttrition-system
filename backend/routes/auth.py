@@ -63,6 +63,8 @@ def update_user_me(
         current_user.goal = profile_update.goal
     if profile_update.target_calories is not None:
         current_user.target_calories = profile_update.target_calories
+    if profile_update.is_public is not None:
+        current_user.is_public = profile_update.is_public
     
     db.add(current_user)
     db.commit()

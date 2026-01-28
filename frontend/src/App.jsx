@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import ScanLabel from './pages/ScanLabel';
 import MealPlanner from './pages/MealPlanner';
 import Profile from './pages/Profile';
+import Social from './pages/Social';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -45,6 +46,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/social"
+            element={
+              <ProtectedRoute>
+                <Social />
               </ProtectedRoute>
             }
           />

@@ -1,24 +1,34 @@
-import sys
+import sqlite3
 import os
-from pathlib import Path
 
-# Add backend to path
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'backend'))
+def check_db():
+    db_path = 'backend/nutritrack.db'
+    print(f"Checking DB at: {os.path.abspath(db_path)}")
+    if not os.path.exists(db_path):
+        print("DB file not found!")
+        return
 
-from core.database import SessionLocal
-from models.food import Food
-
-def list_foods():
-    db = SessionLocal()
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
     try:
-        foods = db.query(Food).all()
-        print(f"Total foods found: {len(foods)}")
-        print("-" * 30)
-        for food in foods:
-            print(f"- {food.name} ({food.calories} kcal)")
-        print("-" * 30)
+        cursor.execute("PRAGMA table_info(users)")
+        columns = cursor.fetchall()
+        print("Users table columns:")
+        found = False
+        for col in columns:
+            print(col)
+            if col[1] == 'is_public':
+                found = True
+        
+        if found:
+            print("✅ is_public column FOUND.")
+        else:
+            print("❌ is_public column NOT FOUND.")
+
+    except Exception as e:
+        print(e)
     finally:
-        db.close()
+        conn.close()
 
 if __name__ == "__main__":
-    list_foods()
+    check_db()

@@ -13,8 +13,14 @@ export const AuthProvider = ({ children }) => {
         if (token) {
             try {
                 const decoded = jwtDecode(token);
-                // The token payload has "sub" which is the email
-                setUser({ email: decoded.sub });
+                // Check if expired
+                if (decoded.exp * 1000 < Date.now()) {
+                    console.warn("Token expired");
+                    logout();
+                } else {
+                    // The token payload has "sub" which is the email
+                    setUser({ email: decoded.sub });
+                }
             } catch (e) {
                 console.error("Invalid token", e);
                 logout();
