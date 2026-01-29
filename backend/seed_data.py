@@ -11,26 +11,23 @@ def seed_users():
         test_pass = "password123"
         
         user = db.query(User).filter(User.email == test_email).first()
-        if not user:
-            print(f"Creating test user: {test_email}")
-            hashed_password = get_password_hash(test_pass)
-            new_user = User(
-                email=test_email, 
-                hashed_password=hashed_password,
-                is_active=True,
-                is_public=True,
-                target_calories=2000
-            )
-            db.add(new_user)
+        if user:
+            print(f"Deleting existing test user {test_email} to ensure fresh state...")
+            db.delete(user)
             db.commit()
-            print("Test user created successfully.")
-        else:
-            # Optional: Ensure password is correct for debugging (force reset)
-            print(f"Test user {test_email} found. Verifying credentials...")
-            # We can just reset it to be safe
-            user.hashed_password = get_password_hash(test_pass)
-            db.commit()
-            print("Test user password verified/reset.")
+        
+        print(f"Creating test user: {test_email}")
+        hashed_password = get_password_hash(test_pass)
+        new_user = User(
+            email=test_email, 
+            hashed_password=hashed_password,
+            is_active=True,
+            is_public=True,
+            target_calories=2000
+        )
+        db.add(new_user)
+        db.commit()
+        print("Test user created successfully.")
             
     except Exception as e:
         print(f"Error seeding users: {e}")

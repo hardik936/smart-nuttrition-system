@@ -70,3 +70,29 @@ def update_user_me(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+@router.get("/debug")
+def debug_auth(db: Session = Depends(get_db)):
+    """Temporary debug endpoint to check test user status"""
+    email = "test@example.com"
+    password = "password123"
+    
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        return {
+            "status": "error",
+            "message": f"User {email} NOT FOUND in database",
+            "db_url_masked": str(db.get_bind().url).replace("postgres://", "postgres://***@").replace("postgresql://", "postgresql://***@")
+        }
+    
+    is_password_correct = verify_password(password, user.hashed_password)
+    
+    return {
+        "status": "ok",
+        "user_id": user.id,
+        "email": user.email,
+        "hashed_password_sample": user.hashed_password[:10] + "...",
+        "password_check": "MATCH" if is_password_correct else "MISMATCH",
+        "is_active": user.is_active
+    }
