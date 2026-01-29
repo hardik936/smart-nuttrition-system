@@ -4,9 +4,12 @@ from core.database import engine, Base
 import models
 
 from routes import auth, logs
+from seed_data import seed_users
 
 # Create tables on startup
 Base.metadata.create_all(bind=engine)
+# Seed test user on startup to ensure login works in all environments
+seed_users()
 
 app = FastAPI(title="NutriTrack API")
 

@@ -1,5 +1,41 @@
 from core.database import SessionLocal
 from models.food import Food
+from models.user import User
+from core.security import get_password_hash
+
+def seed_users():
+    """Ensures test user exists with correct password."""
+    db = SessionLocal()
+    try:
+        test_email = "test@example.com"
+        test_pass = "password123"
+        
+        user = db.query(User).filter(User.email == test_email).first()
+        if not user:
+            print(f"Creating test user: {test_email}")
+            hashed_password = get_password_hash(test_pass)
+            new_user = User(
+                email=test_email, 
+                hashed_password=hashed_password,
+                is_active=True,
+                is_public=True,
+                target_calories=2000
+            )
+            db.add(new_user)
+            db.commit()
+            print("Test user created successfully.")
+        else:
+            # Optional: Ensure password is correct for debugging (force reset)
+            print(f"Test user {test_email} found. Verifying credentials...")
+            # We can just reset it to be safe
+            user.hashed_password = get_password_hash(test_pass)
+            db.commit()
+            print("Test user password verified/reset.")
+            
+    except Exception as e:
+        print(f"Error seeding users: {e}")
+    finally:
+        db.close()
 
 def seed_foods():
     db = SessionLocal()
@@ -122,3 +158,4 @@ def seed_foods():
 
 if __name__ == "__main__":
     seed_foods()
+    seed_users()
