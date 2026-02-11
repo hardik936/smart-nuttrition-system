@@ -1,8 +1,14 @@
 import axios from 'axios';
 
+const configuredApiUrl = import.meta.env.VITE_API_URL;
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+    baseURL: configuredApiUrl || 'http://localhost:8000',
 });
+
+if (!configuredApiUrl && typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    console.warn('VITE_API_URL is not configured. API calls may fail in deployed frontend.');
+}
 
 api.interceptors.request.use(
     (config) => {

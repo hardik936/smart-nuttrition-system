@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
+import { getFriendlyApiError } from '../utils/apiError';
 
 const Register = () => {
     const [email, setEmail] = useState('');
@@ -14,7 +15,8 @@ const Register = () => {
             await api.post('/auth/register', { email, password });
             navigate('/login');
         } catch (err) {
-            setError(err.response?.data?.detail || 'Registration failed');
+            console.error('Register Error:', err);
+            setError(getFriendlyApiError(err, 'Registration failed'));
         }
     };
 
