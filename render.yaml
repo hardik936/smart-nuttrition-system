@@ -27,7 +27,7 @@ services:
     plan: free
     envVars:
       - key: VITE_API_URL
-        value: https://CHANGE_ME_TO_BACKEND_URL.onrender.com
+        value: https://smart-nutrition-backend.onrender.com
 
 databases:
   # -----------------------------

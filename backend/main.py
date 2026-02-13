@@ -15,9 +15,16 @@ app = FastAPI(title="NutriTrack API")
 
 from fastapi.middleware.cors import CORSMiddleware
 
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://smart-nutrition-frontend.onrender.com",
+    "https://smart-nutrition-system.onrender.com" # Potential alias
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all origins for deployment
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
