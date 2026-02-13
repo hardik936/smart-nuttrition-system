@@ -33,7 +33,7 @@ def test_api():
     print("Creating log...")
     # Assuming food_id=1 exists
     log_data = {"food_id": 1, "quantity": 1.5}
-    resp = requests.post(f"{BASE_URL}/logs/", json=log_data, headers=headers)
+    resp = requests.post(f"{BASE_URL}/api/v1/logs/", json=log_data, headers=headers)
     if resp.status_code != 200:
         print(f"Create log failed: {resp.status_code} {resp.text}")
         sys.exit(1)
@@ -41,7 +41,7 @@ def test_api():
 
     # 4. Get Logs
     print("Fetching logs...")
-    resp = requests.get(f"{BASE_URL}/logs/", headers=headers)
+    resp = requests.get(f"{BASE_URL}/api/v1/logs/", headers=headers)
     if resp.status_code != 200:
         print(f"Get logs failed: {resp.status_code} {resp.text}")
         sys.exit(1)

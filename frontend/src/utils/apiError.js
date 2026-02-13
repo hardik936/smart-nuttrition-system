@@ -1,12 +1,8 @@
 import axios from 'axios';
 
 export const isApiBaseUrlMissingInProd = () => {
-  const baseUrl = import.meta.env.VITE_API_URL;
-  const isLocalHost =
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1';
-
-  return !baseUrl && !isLocalHost;
+  // Always return false to allow axios fallback URL to work
+  return false;
 };
 
 export const getFriendlyApiError = (err, fallbackMessage = 'Request failed') => {

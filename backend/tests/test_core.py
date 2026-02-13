@@ -50,7 +50,7 @@ def test_create_food_and_log_meal(client, db_session):
 
     # 3. Test: Log the meal
     response = client.post(
-        "/logs/",
+        "/api/v1/logs/",
         json={"food_id": apple.id, "quantity": 1.0},
         headers=headers
     )
@@ -62,7 +62,7 @@ def test_create_food_and_log_meal(client, db_session):
 def test_unauthorized_log_access(client):
     # Try to access protected route without token
     response = client.post(
-        "/logs/",
+        "/api/v1/logs/",
         json={"food_id": 1, "quantity": 1.0}
     )
     assert response.status_code == 401
