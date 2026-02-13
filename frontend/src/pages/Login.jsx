@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import { getFriendlyApiError } from '../utils/apiError';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -22,9 +23,8 @@ const Login = () => {
             login(response.data.access_token);
             navigate('/');
         } catch (err) {
-            console.error("Login Error:", err);
-            const errorMessage = err.response?.data?.detail || 'Invalid email or password';
-            setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+            console.error('Login Error:', err);
+            setError(getFriendlyApiError(err, 'Invalid email or password'));
         }
     };
 
