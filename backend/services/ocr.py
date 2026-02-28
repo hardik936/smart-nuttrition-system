@@ -3,8 +3,11 @@ import re
 import pytesseract
 from PIL import Image, ImageOps, ImageEnhance
 
-# Set Tesseract Path explicitly for Windows
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+import os
+
+# Set Tesseract Path explicitly for Windows, otherwise rely on PATH (Linux/Render)
+if os.name == 'nt':
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def parse_nutrition_label(image_bytes: bytes) -> dict:
     """
