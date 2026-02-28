@@ -29,10 +29,10 @@ def generate_meal_plan(calories: int, diet_type: str, allergies: str, context: l
     context_str = ", ".join(context[:10]) if context else "common foods"
     
     prompt = (
-        f"Create a {calories} calorie {diet_type} meal plan avoiding {allergies}. "
-        f"Use these foods: {context_str}. "
-        "Return ONLY a JSON array with objects having keys: 'meal' (e.g. Breakfast), 'food' (exact name from list), 'calories' (approx int). "
-        "Example: [{\"meal\": \"Breakfast\", \"food\": \"Oatmeal\", \"calories\": 300}]"
+        f"Create a {calories} calorie {diet_type} daily meal plan avoiding {allergies}. "
+        f"Use these ingredients as inspiration: {context_str}. "
+        "Return ONLY a JSON array with objects having keys: 'meal' (e.g. Breakfast), 'food' (a descriptive, realistic meal combination like 'Oatmeal with Almonds and Berries' or 'Grilled Chicken with Quinoa and Roasted Broccoli'), 'calories' (approx int). "
+        "Make sure to include proteins, carbs, and fats in each meal. Example: [{\"meal\": \"Breakfast\", \"food\": \"Oatmeal with Almonds and Berries\", \"calories\": 400}]"
     )
 
     try:
@@ -70,11 +70,11 @@ def generate_fallback_plan(calories: int, diet_type: str, allergies: str, contex
         if not foods:
             foods = ["Tofu", "Lentils", "Chickpeas", "Quinoa", "Spinach"]
     
-    # Generate meal plan
-    breakfast_food = foods[0] if len(foods) > 0 else "Oatmeal"
-    lunch_food = foods[1] if len(foods) > 1 else "Salad"
-    dinner_food = foods[2] if len(foods) > 2 else "Grilled Vegetables"
-    snack_food = foods[3] if len(foods) > 3 else "Fruit"
+    # Generate meal combinations
+    breakfast_food = f"{foods[0]} with a side of Yogurt and Berries" if len(foods) > 0 else "Oatmeal with Milk and Berries"
+    lunch_food = f"Mixed Salad with {foods[1]}" if len(foods) > 1 else "Mixed Salad with Grilled Chicken"
+    dinner_food = f"Roasted {foods[2]} with Quinoa and Veggies" if len(foods) > 2 else "Grilled Salmon with Roasted Vegetables"
+    snack_food = f"Handful of Almonds and an {foods[3]}" if len(foods) > 3 else "Handful of Almonds and an Apple"
     
     cal_breakfast = int(calories * 0.25)
     cal_lunch = int(calories * 0.35)
