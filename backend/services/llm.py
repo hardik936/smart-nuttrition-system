@@ -71,27 +71,24 @@ def generate_fallback_plan(calories: int, diet_type: str, allergies: str, contex
             foods = ["Tofu", "Lentils", "Chickpeas", "Quinoa", "Spinach"]
     
     # Generate meal plan
-    breakfast = foods[0] if len(foods) > 0 else "Oatmeal"
-    lunch = foods[1] if len(foods) > 1 else "Salad"
-    dinner = foods[2] if len(foods) > 2 else "Grilled Vegetables"
-    snack = foods[3] if len(foods) > 3 else "Fruit"
+    breakfast_food = foods[0] if len(foods) > 0 else "Oatmeal"
+    lunch_food = foods[1] if len(foods) > 1 else "Salad"
+    dinner_food = foods[2] if len(foods) > 2 else "Grilled Vegetables"
+    snack_food = foods[3] if len(foods) > 3 else "Fruit"
     
     cal_breakfast = int(calories * 0.25)
     cal_lunch = int(calories * 0.35)
     cal_dinner = int(calories * 0.30)
     cal_snack = int(calories * 0.10)
     
-    plan = f"""
-🍽️ Your {calories} Calorie {diet_type} Meal Plan
-
-🌅 Breakfast ({cal_breakfast} cal): {breakfast} with whole grain toast
-🌞 Lunch ({cal_lunch} cal): {lunch} with mixed vegetables
-🌙 Dinner ({cal_dinner} cal): {dinner} with side salad
-🍎 Snack ({cal_snack} cal): {snack}
-
-💡 Note: This plan uses foods from your database. Adjust portions to meet calorie targets.
-"""
-    return plan.strip()
+    plan = [
+        {"meal": "Breakfast", "food": breakfast_food, "calories": cal_breakfast},
+        {"meal": "Lunch", "food": lunch_food, "calories": cal_lunch},
+        {"meal": "Dinner", "food": dinner_food, "calories": cal_dinner},
+        {"meal": "Snack", "food": snack_food, "calories": cal_snack}
+    ]
+    
+    return json.dumps(plan)
 
 def extract_food_from_text(text: str) -> list[dict]:
     """

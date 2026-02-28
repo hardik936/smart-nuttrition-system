@@ -15,8 +15,12 @@ const Register = () => {
             await api.post('/auth/register', { email, password });
             navigate('/login');
         } catch (err) {
-            console.error('Register Error:', err);
-            setError(getFriendlyApiError(err, 'Registration failed'));
+            console.error("Registration Error:", err);
+            if (!err.response) {
+                setError('Network error: Unable to reach server. Please check your connection or try again later.');
+            } else {
+                setError(err.response?.data?.detail || 'Registration failed');
+            }
         }
     };
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api/axios';
 import '../index.css';
 
 function MealPlanner() {
@@ -26,7 +26,7 @@ function MealPlanner() {
         setMealPlan(null);
 
         try {
-            const response = await axios.post('http://127.0.0.1:8000/api/v1/plan/generate-plan', formData);
+            const response = await api.post('/api/v1/plan/generate-plan', formData);
             setMealPlan(response.data.plan);
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to generate meal plan. Please try again.');
@@ -39,7 +39,7 @@ function MealPlanner() {
         if (!mealPlan) return;
         setLoading(true);
         try {
-            await axios.post('http://127.0.0.1:8000/api/v1/plan/commit', { plan: mealPlan });
+            await api.post('/api/v1/plan/commit', { plan: mealPlan });
             alert('Meal plan added to your log!');
         } catch (err) {
             alert('Failed to add meal plan.');

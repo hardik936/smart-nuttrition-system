@@ -145,6 +145,12 @@ def seed_foods():
             if not exists:
                 db.add(Food(**food_item))
                 print(f"Added {food_item['name']}")
+            else:
+                exists.calories = food_item["calories"]
+                exists.protein = food_item["protein"]
+                exists.carbs = food_item["carbs"]
+                exists.fat = food_item["fat"]
+                print(f"Updated {food_item['name']}")
         
         db.commit()
         print("Food database updated.")

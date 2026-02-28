@@ -35,12 +35,35 @@ async def create_meal_plan(request: MealPlanRequest, db: Session = Depends(get_d
         # Attempt to parse JSON to ensure valid format, if LLM adhered to instructions
         # If not, we just return the text
         try:
+            # Try parsing the whole thing first
             plan_json = json.loads(plan_text)
-            return {"plan": plan_json}
+            if isinstance(plan_json, list) and len(plan_json) > 0:
+                return {"plan": plan_json}
         except json.JSONDecodeError:
-            # Fallback if LLM didn't return pure JSON
-            return {"plan": plan_text, "note": "Raw output returned"}
+            pass
+
+        # If it wasn't pure JSON, let's extract individual JSON objects using regex
+        import re
+        objects = re.findall(r'\{[^{}]+\}', plan_text)
+        extracted_plan = []
+        for obj_str in objects:
+            try:
+                # Fix common single quote issues from LLMs
+                clean_str = obj_str.replace("'", '"')
+                obj = json.loads(clean_str)
+                if isinstance(obj, dict) and "meal" in obj and "food" in obj:
+                    extracted_plan.append(obj)
+            except json.JSONDecodeError:
+                continue
+                
+        if len(extracted_plan) > 0:
+            return {"plan": extracted_plan}
             
+        # Total failure to extract valid JSON objects, use the fallback generator
+        from services.llm import generate_fallback_plan
+        fallback = json.loads(generate_fallback_plan(request.calories, request.diet, allergies, context=food_context))
+        return {"plan": fallback, "note": "Generated from fallback due to AI output issues."}
+        
     except HTTPException as he:
         raise he
     except Exception as e:

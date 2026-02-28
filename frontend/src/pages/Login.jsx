@@ -23,8 +23,13 @@ const Login = () => {
             login(response.data.access_token);
             navigate('/');
         } catch (err) {
-            console.error('Login Error:', err);
-            setError(getFriendlyApiError(err, 'Invalid email or password'));
+            console.error("Login Error:", err);
+            if (!err.response) {
+                setError('Network error: Unable to reach server. Please check your connection or try again later.');
+            } else {
+                const errorMessage = err.response?.data?.detail || 'Invalid email or password';
+                setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+            }
         }
     };
 
