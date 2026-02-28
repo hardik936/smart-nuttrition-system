@@ -17,6 +17,11 @@ def parse_nutrition_label(image_bytes: bytes) -> dict:
         # Load image from bytes
         image = Image.open(io.BytesIO(image_bytes))
         
+        # Resize image to prevent Tesseract from hanging on high-res phone photos
+        max_dimension = 1200
+        if max(image.size) > max_dimension:
+            image.thumbnail((max_dimension, max_dimension), Image.Resampling.LANCZOS)
+            
         # Preprocessing for better OCR
         # 1. Convert to grayscale
         image = image.convert('L')
