@@ -10,9 +10,7 @@ services:
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: smart-nutrition-db
-          property: connectionString
+        sync: false
       - key: PORT
         value: 8000
 
@@ -29,11 +27,4 @@ services:
       - key: VITE_API_URL
         value: https://smart-nutrition-backend.onrender.com
 
-databases:
-  # -----------------------------
-  # Database Service (PostgreSQL)
-  # -----------------------------
-  - name: smart-nutrition-db
-    databaseName: smartnutrition
-    user: smartnutrition_user
-    plan: free
+
