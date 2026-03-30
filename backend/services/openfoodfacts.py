@@ -8,7 +8,10 @@ def get_food_by_barcode(barcode: str) -> dict:
     url = f"https://world.openfoodfacts.org/api/v0/product/{barcode}.json"
     
     try:
-        response = requests.get(url, timeout=5)
+        headers = {
+            "User-Agent": "SmartNutritionSystem/1.0 (contact@smartnutrition.local)"
+        }
+        response = requests.get(url, headers=headers, timeout=5)
         response.raise_for_status()
         data = response.json()
         
