@@ -1,9 +1,16 @@
 import os
 import sys
 
-# Set it properly in python
-neon_url = "postgresql://neondb_owner:npg_0wYaA7RFiuxo@ep-weathered-wave-aioucfqo-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-os.environ["DATABASE_URL"] = neon_url
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load from .env securely
+env_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
+if not os.environ.get("DATABASE_URL"):
+    os.environ["DATABASE_URL"] = "sqlite:///./nutritrack_v2.db"
+
 
 from seed_data import seed_users, seed_foods
 from core.database import Base, engine
