@@ -29,10 +29,11 @@ def generate_meal_plan(calories: int, diet_type: str, allergies: str, context: l
     context_str = ", ".join(context[:10]) if context else "common foods"
     
     prompt = (
-        f"Create a {calories} calorie {diet_type} daily meal plan avoiding {allergies}. "
-        f"Use these ingredients as inspiration: {context_str}. "
-        "Return ONLY a JSON array with objects having keys: 'meal' (e.g. Breakfast), 'food' (a descriptive, realistic meal combination like 'Oatmeal with Almonds and Berries' or 'Grilled Chicken with Quinoa and Roasted Broccoli'), 'calories' (approx int). "
-        "Make sure to include proteins, carbs, and fats in each meal. Example: [{\"meal\": \"Breakfast\", \"food\": \"Oatmeal with Almonds and Berries\", \"calories\": 400}]"
+        f"Create a strict {calories} kcal {diet_type} daily meal plan that is highly satisfying, sustainable, and nutritionally complete for a real human. "
+        f"CRITICAL ALLERGY AVOIDANCE: Do NOT include ANY ingredients related to {allergies} or their derivatives! "
+        f"Ensure EVERY meal contains a balanced ratio of lean protein, complex carbohydrates, and healthy fats. Use these ingredients as inspiration: {context_str}. "
+        "Return ONLY a JSON array with objects having keys: 'meal' (e.g. Breakfast), 'food' (e.g. '150g Grilled Chicken with 1 cup Brown Rice and 100g Roasted Broccoli'), 'calories' (approx int). "
+        "Include exact metric amounts (grams, cups) for EVERY food item. Example: [{\"meal\": \"Breakfast\", \"food\": \"1 cup Oatmeal with 30g Almonds, 1 tbsp Peanut Butter, and 50g Berries\", \"calories\": 400}]"
     )
 
     try:
@@ -62,19 +63,35 @@ def generate_fallback_plan(calories: int, diet_type: str, allergies: str, contex
     # Filter out allergies
     if allergies and allergies.lower() != "none":
         allergy_list = [a.strip().lower() for a in allergies.split(',')]
-        foods = [f for f in foods if not any(allergy in f.lower() for allergy in allergy_list)]
+        
+        # Extended allergen matrix for better filtering
+        allergen_map = {
+            "dairy": ["milk", "cheese", "yogurt", "butter", "cream", "whey"],
+            "nuts": ["almond", "peanut", "cashew", "walnut", "pecan", "macadamia", "nut"],
+            "gluten": ["wheat", "bread", "pasta", "flour"],
+            "seafood": ["salmon", "fish", "shrimp", "tuna", "crab"],
+            "meat": ["chicken", "beef", "pork", "turkey"]
+        }
+        
+        expanded_allergies = set(allergy_list)
+        for allergy in allergy_list:
+            for key, mapped_items in allergen_map.items():
+                if allergy in key or key in allergy:
+                    expanded_allergies.update(mapped_items)
+                    
+        foods = [f for f in foods if not any(allergen in f.lower() for allergen in expanded_allergies)]
     
     # Adjust based on diet type
     if diet_type.lower() in ["vegetarian", "vegan"]:
-        foods = [f for f in foods if f.lower() not in ["chicken", "salmon", "eggs"]]
+        foods = [f for f in foods if not any(meat in f.lower() for meat in ["chicken", "salmon", "beef", "pork", "turkey"])]
         if not foods:
-            foods = ["Tofu", "Lentils", "Chickpeas", "Quinoa", "Spinach"]
+            foods = ["150g Tofu", "1 cup Lentils", "1 cup Chickpeas", "1 cup Quinoa", "100g Spinach"]
     
-    # Generate meal combinations
-    breakfast_food = f"{foods[0]} with a side of Yogurt and Berries" if len(foods) > 0 else "Oatmeal with Milk and Berries"
-    lunch_food = f"Mixed Salad with {foods[1]}" if len(foods) > 1 else "Mixed Salad with Grilled Chicken"
-    dinner_food = f"Roasted {foods[2]} with Quinoa and Veggies" if len(foods) > 2 else "Grilled Salmon with Roasted Vegetables"
-    snack_food = f"Handful of Almonds and an {foods[3]}" if len(foods) > 3 else "Handful of Almonds and an Apple"
+    # Generate meal combinations with sizes and balanced macros
+    breakfast_food = f"1 cup {foods[0]} with 1/2 cup Plant Milk, 30g Nuts, and 50g Berries" if len(foods) > 0 else "1 cup Oatmeal with 1 cup Almond Milk, 1 tbsp Peanut Butter, and 50g Blueberries"
+    lunch_food = f"2 cups Mixed Salad with 150g {foods[1]}, 1/2 cup Quinoa, and 2 tbsp Olive Oil" if len(foods) > 1 else "2 cups Mixed Salad with 150g Grilled Chicken Breast, 1/2 cup Brown Rice, and 1/4 Avocado"
+    dinner_food = f"150g Roasted {foods[2]} with 1 cup Quinoa and 100g Veggies" if len(foods) > 2 else "150g Grilled Salmon with 150g Roasted Vegetables and 1 medium Sweet Potato"
+    snack_food = f"30g mixed seeds and 1 medium {foods[3]}" if len(foods) > 3 else "30g Walnuts, 1 medium Apple, and 1 string Cheese (or Vegan alternative)"
     
     cal_breakfast = int(calories * 0.25)
     cal_lunch = int(calories * 0.35)

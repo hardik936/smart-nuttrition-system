@@ -33,3 +33,4 @@ def get_food_by_barcode(barcode: str) -> dict:
     except Exception as e:
         print(f"Error fetching OpenFoodFacts data: {e}")
         return None
+        

@@ -45,12 +45,13 @@ def parse_nutrition_label(image_bytes: bytes) -> dict:
         # 4. Use LLM to extract structured data instead of regexes
         if HUGGINGFACE_API_KEY:
             prompt = (
-                f"Extract nutrition facts per 100g from this text: '{text}'. "
-                "Return ONLY a JSON object with keys: 'name_guess' (string, main product name or ''), "
-                "'calories' (float, kcal per 100g), 'protein' (float, g per 100g), "
-                "'carbs' (float, total carbohydrates g per 100g), 'fat' (float, total fat g per 100g). "
-                "If per 100g is not available, use per serving. If missing, use 0.0. "
-                "Example output: {\"name_guess\": \"Oats\", \"calories\": 380.0, \"protein\": 13.0, \"carbs\": 66.0, \"fat\": 6.5}"
+                f"Extract nutrition facts from this text: '{text}'. "
+                "Return ONLY a JSON object with strictly these keys: 'name_guess' (string), "
+                "'serving_size_g' (float, the grams in parenthesis of the serving size, or 100.0 if not listed), "
+                "'calories' (float, from the label), 'protein' (float, from the label), "
+                "'carbs' (float, from the label), 'fat' (float, from the label). "
+                "Do NOT scale or convert the numbers. Just extract them exactly as printed. "
+                "Example output: {\"name_guess\": \"Oats\", \"serving_size_g\": 50.0, \"calories\": 250.0, \"protein\": 5.0, \"carbs\": 40.0, \"fat\": 8.0}"
             )
             try:
                 response = client.text_generation(
@@ -66,12 +67,17 @@ def parse_nutrition_label(image_bytes: bytes) -> dict:
                 if match:
                     json_str = match.group(0)
                     parsed_json = json.loads(json_str)
+                    
+                    serving_size_g = float(parsed_json.get("serving_size_g", 100.0))
+                    if serving_size_g <= 0: serving_size_g = 100.0
+                    multiplier = 100.0 / serving_size_g
+
                     return {
                         "name_guess": str(parsed_json.get("name_guess", "")),
-                        "calories": float(parsed_json.get("calories", 0.0)),
-                        "protein": float(parsed_json.get("protein", 0.0)),
-                        "carbs": float(parsed_json.get("carbs", 0.0)),
-                        "fat": float(parsed_json.get("fat", 0.0))
+                        "calories": round(float(parsed_json.get("calories", 0.0)) * multiplier, 2),
+                        "protein": round(float(parsed_json.get("protein", 0.0)) * multiplier, 2),
+                        "carbs": round(float(parsed_json.get("carbs", 0.0)) * multiplier, 2),
+                        "fat": round(float(parsed_json.get("fat", 0.0)) * multiplier, 2)
                     }
             except Exception as e:
                 print(f"LLM Extraction failed, falling back to regex: {e}")
@@ -95,10 +101,14 @@ def parse_nutrition_label(image_bytes: bytes) -> dict:
                     return default
             return default
 
-        result["calories"] = extract_value(r'(?:Calories|Energy|kcal).*?(\d+(?:\.\d+)?)', text)
-        result["protein"] = extract_value(r'Protein.*?(\d+(?:\.\d+)?)', text)
-        result["carbs"] = extract_value(r'(?:Carbohydrate|Carbs|Total Carb).*?(\d+(?:\.\d+)?)', text)
-        result["fat"] = extract_value(r'(?:Total Fat|Fat).*?(\d+(?:\.\d+)?)', text)
+        serving_size_g = extract_value(r'Serving\s*Size.*?(\d+(?:\.\d+)?)\s*g', text, 100.0)
+        if serving_size_g <= 0: serving_size_g = 100.0
+        multiplier = 100.0 / serving_size_g
+
+        result["calories"] = round(extract_value(r'(?:Calories|Energy|kcal).*?(\d+(?:\.\d+)?)', text) * multiplier, 2)
+        result["protein"] = round(extract_value(r'Protein.*?(\d+(?:\.\d+)?)', text) * multiplier, 2)
+        result["carbs"] = round(extract_value(r'(?:Carbohydrate|Carbs|Total Carb).*?(\d+(?:\.\d+)?)', text) * multiplier, 2)
+        result["fat"] = round(extract_value(r'(?:Total Fat|Fat).*?(\d+(?:\.\d+)?)', text) * multiplier, 2)
 
         lines = [line.strip() for line in text.split('\n') if line.strip()]
         name_guess = ""

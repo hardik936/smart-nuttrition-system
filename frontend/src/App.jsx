@@ -9,6 +9,7 @@ import MealPlanner from './pages/MealPlanner';
 import Profile from './pages/Profile';
 import Social from './pages/Social';
 import ProtectedRoute from './components/ProtectedRoute';
+import InstallPWA from './components/InstallPWA';
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
           <Route path="/dashboard" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <InstallPWA />
       </AuthProvider>
     </Router>
   );
